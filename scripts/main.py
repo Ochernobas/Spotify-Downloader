@@ -85,9 +85,7 @@ class Core:
             self.img = track["imagemURL"]
             self.album = track["album"]
             self.artist = track["artista"]
-
-            #Pega a url da música no youtube
-            url = self.youtube.getURL(f"{self.name} {self.artist}")
+            url = track["url"]
             print(url)
 
             #Baixa a música em mp3
@@ -121,7 +119,7 @@ class Core:
         self.mus = musica
 
         #Pega a URL da música no youtube
-        url = self.youtube.getURL(f"{self.mus["nome"]} {self.mus["artista"]}")
+        url = musica["url"]
 
         #Baixa a música em mp4
         arquivo = self.downloader.downloadVideo(url, self.path, self.mus["nome"])
@@ -204,7 +202,8 @@ class Frame1(customtkinter.CTkScrollableFrame):
             "nome": None,
             "artista": [],
             "album": None,
-            "imagemURL": None
+            "imagemURL": None,
+            "url": None
         }
 
         self.inputNome = []
@@ -222,14 +221,20 @@ class Frame1(customtkinter.CTkScrollableFrame):
             for artist in track["track"]["artists"]:
                 musica["artista"].append(artist["name"])
 
+            musica["url"] = self.core.youtube.getURL(f"{musica["nome"]} {musica["artista"]}")
+
             self.musicas.append(musica)
 
             musica = {
                 "nome": None,
                 "artista": [],
                 "album": None,
-                "imagemURL": None
+                "imagemURL": None,
+                "url": None
             }
+
+        for musica in self.musicas:
+            print(musica)
 
         self.mostraMusicas()
 
@@ -280,11 +285,14 @@ class Frame1(customtkinter.CTkScrollableFrame):
             self.album = None
 
 
-    def openTopLevel(self):
-        if self.top_levelwindow is None or not self.top_levelwindow.winfo_exists():
-            self.top_levelwindow = TopLevel(self)  # create window if its None or destroyed
-        else:
-            self.top_levelwindow.focus()
+    def openTopLevel(self, index):
+        self.top_levelwindow = customtkinter.CTkInputDialog(text="Altere o link", title=f"{self.musicas[index]["nome"]} - {self.musicas[index]["artista"]}")
+        input = self.top_levelwindow.get_input()
+
+        if input != None:
+            self.musicas[index]["url"] = input
+
+        print(self.musicas[index]["url"])
 
 
     #Apaga uma música da tela e dos arrays (Lixeira)
@@ -293,6 +301,7 @@ class Frame1(customtkinter.CTkScrollableFrame):
         self.musicas.pop(i)
         self.buttons1 = []
         self.buttons2 = []
+        self.buttons3 = []
         self.inputNome = []
         self.inputAlbum = []
         self.inputArtista = []
@@ -327,18 +336,10 @@ class Frame1(customtkinter.CTkScrollableFrame):
         else:
             for i, musica in enumerate(self.musicas):
                 self.musicas[i]["nome"] = self.inputNome[i].get()
-                self.musicas[i]["artista"] = self.inputArtista[i].get()
+                self.musicas[i]["artista"] = self.inputArtista[i].get().replace("{", "").replace("}", "")
                 self.musicas[i]["album"] = self.inputAlbum[i].get()
                 print(self.musicas[i])
 
-
-class TopLevel(customtkinter.CTkToplevel):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.geometry("400x300")
-
-        self.label = customtkinter.CTkLabel(self, text="ToplevelWindow")
-        self.label.pack(padx=20, pady=20)
 
 #Frame superior da tela, onde pode ser digitado o link
 class Frame0(customtkinter.CTkScrollableFrame):
