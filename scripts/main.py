@@ -73,7 +73,7 @@ class Core:
         pl_id = self.playlist.split("playlist/")[1].split("?")[0]
         pl = self.spotify.iniciando(pl_id, True)
 
-        return pl
+        return pl #JSON da Playlist
 
 
     #Baixa todas as músicas da playlist
@@ -158,6 +158,8 @@ class Frame1(customtkinter.CTkScrollableFrame):
         self.musicas = []
         self.image = customtkinter.CTkImage(Image.open(r"C:\Users\pacot\PycharmProjects\SpotipyFinal\src\img\delete_FILL0_wght400_GRAD0_opsz24.png"))
         self.image1 = customtkinter.CTkImage(Image.open(r"C:\Users\pacot\PycharmProjects\SpotipyFinal\src\img\download_FILL0_wght400_GRAD0_opsz24.png"))
+        self.image2 = customtkinter.CTkImage(Image.open(r"C:\Users\pacot\PycharmProjects\SpotipyFinal\src\img\edit_24dp_FILL0_wght400_GRAD0_opsz24.png"))
+        self.top_levelwindow = None
 
 
     #Pega os dados de uma música só
@@ -210,6 +212,7 @@ class Frame1(customtkinter.CTkScrollableFrame):
         self.inputAlbum = []
         self.buttons1 = []
         self.buttons2 = []
+        self.buttons3 = []
 
         for track in json:
             musica["nome"] = track["track"]["name"]
@@ -268,9 +271,20 @@ class Frame1(customtkinter.CTkScrollableFrame):
                                                    height=15, hover_color="#9B9A9A", command=lambda text=i:self.apagaMusica(text)))
             self.buttons2[i].grid(row=i+1, column=4, padx=5, pady=10, sticky="nsew")
 
+            self.buttons3.append(customtkinter.CTkButton(self, image=self.image2, text="", fg_color="transparent", width=15,
+                                                         height=15, hover_color="#9B9A9A", command=lambda text=i: self.openTopLevel(text)))
+            self.buttons3[i].grid(row=i + 1, column=5, padx=5, pady=10, sticky="nsew")
+
             self.musica = None
             self.artista = None
             self.album = None
+
+
+    def openTopLevel(self):
+        if self.top_levelwindow is None or not self.top_levelwindow.winfo_exists():
+            self.top_levelwindow = TopLevel(self)  # create window if its None or destroyed
+        else:
+            self.top_levelwindow.focus()
 
 
     #Apaga uma música da tela e dos arrays (Lixeira)
@@ -318,6 +332,14 @@ class Frame1(customtkinter.CTkScrollableFrame):
                 print(self.musicas[i])
 
 
+class TopLevel(customtkinter.CTkToplevel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.geometry("400x300")
+
+        self.label = customtkinter.CTkLabel(self, text="ToplevelWindow")
+        self.label.pack(padx=20, pady=20)
+
 #Frame superior da tela, onde pode ser digitado o link
 class Frame0(customtkinter.CTkScrollableFrame):
     def __init__(self, master, **kwargs):
@@ -351,15 +373,15 @@ class Frame0(customtkinter.CTkScrollableFrame):
 class Tela(customtkinter.CTk):
     def __init__(self):
         super().__init__()
-        self.geometry("860x780")
+        self.geometry("910x780")
         self.resizable(width=5.0, height=1.0)
-        self.minsize(width=860, height=760)
+        self.minsize(width=910, height=760)
 
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
 
-        self.frame0 = Frame0(master=self, width=800, height=10)
-        self.frame1 = Frame1(master=self, width=800, height=500)
+        self.frame0 = Frame0(master=self, width=850, height=10)
+        self.frame1 = Frame1(master=self, width=850, height=500)
 
         self.frame0.grid(row=0, column=0, padx=20, pady=20, sticky="n")
         self.frame1.grid(row=1, column=0, padx=20, pady=20, sticky="n")
