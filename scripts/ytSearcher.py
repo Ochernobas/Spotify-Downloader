@@ -1,4 +1,5 @@
 from youtube_search import YoutubeSearch
+from youtubesearchpython import VideosSearch
 
 class Youtube:
     def __init__(self):
@@ -6,6 +7,6 @@ class Youtube:
 
 
     def getURL(self, q):
-        result = YoutubeSearch(f"{q} official audio", max_results=1).to_dict()
-        url = f"www.youtube.com{result[0]["url_suffix"]}"
+        result = VideosSearch(f"{q} official audio", limit=1).result()
+        url = result["result"][0]["link"]
         return url

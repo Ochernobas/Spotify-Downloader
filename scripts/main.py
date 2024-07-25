@@ -7,6 +7,7 @@ import requests
 import subprocess
 import os
 import customtkinter
+import webbrowser
 
 class Core:
     def __init__(self):
@@ -85,6 +86,10 @@ class Core:
             self.img = track["imagemURL"]
             self.album = track["album"]
             self.artist = track["artista"]
+            print(self.artist)
+            if self.artist.find(",") != -1:
+                self.artist.split(", ")
+            print(self.artist)
             url = track["url"]
             print(url)
 
@@ -257,7 +262,19 @@ class Frame1(customtkinter.CTkScrollableFrame):
             self.grid_columnconfigure(i, weight=0)
 
             self.musica.insert(0,musica["nome"])
-            self.artista.insert(0, musica["artista"])
+
+            texto = musica["artista"]
+            print("MUSICA[ARTISTA] - ")
+            print(texto)
+
+            if len(musica["artista"]) > 1:
+                texto = ""
+                for mus in musica["artista"]:
+                    if mus != musica["artista"][-1]:
+                        texto = texto + mus +  ", "
+                    else: texto = texto + mus
+
+            self.artista.insert(0, texto)
             self.album.insert(0, musica["album"])
 
             self.inputNome.append(self.musica)
@@ -286,7 +303,8 @@ class Frame1(customtkinter.CTkScrollableFrame):
 
 
     def openTopLevel(self, index):
-        self.top_levelwindow = customtkinter.CTkInputDialog(text="Altere o link", title=f"{self.musicas[index]["nome"]} - {self.musicas[index]["artista"]}")
+        webbrowser.open_new_tab(self.musicas[index]["url"])
+        self.top_levelwindow = customtkinter.CTkInputDialog(text=f"Link automático aberto no navegador!", title=f"{self.musicas[index]["nome"]} - {self.musicas[index]["artista"]}")
         input = self.top_levelwindow.get_input()
 
         if input != None:
